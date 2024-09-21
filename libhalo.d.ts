@@ -3,6 +3,24 @@ declare module '@arx-research/libhalo/api/web.js' {
         name: string;
         keyNo: number;
         message: string;
-        format: string;
-    }): Promise<void>;
+        format?: string;
+    }): Promise<{
+        etherAddress: string;
+        input: {
+            keyNo: number;
+            digest: string;
+            message: string;
+        };
+        publicKey: string;
+        signature: {
+            der: string;
+            ether: string;
+            raw: {
+                r: string;
+                s: string;
+                v: string;
+            }
+        }
+    }>;
 }
+
