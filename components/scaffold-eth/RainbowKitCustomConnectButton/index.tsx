@@ -7,6 +7,7 @@ import { AddressQRCodeModal } from "./AddressQRCodeModal";
 import { WrongNetworkDropdown } from "./WrongNetworkDropdown";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Address } from "viem";
+import { useAuthContext } from "~~/contexts/AuthContext";
 import { useAutoConnect, useNetworkColor } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
@@ -15,9 +16,10 @@ import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
  * Custom Wagmi Connect Button (watch balance + custom design)
  */
 export const RainbowKitCustomConnectButton = () => {
-  useAutoConnect();
+  // useAutoConnect();
   const networkColor = useNetworkColor();
   const { targetNetwork } = useTargetNetwork();
+  const { address, setUpAddressAsync } = useAuthContext();
 
   return (
     <ConnectButton.Custom>
@@ -28,7 +30,7 @@ export const RainbowKitCustomConnectButton = () => {
           : undefined;
 
         return (
-          <>
+          <div className="flex flex-col gap-2">
             {(() => {
               if (!connected) {
                 return (
@@ -60,7 +62,18 @@ export const RainbowKitCustomConnectButton = () => {
                 </>
               );
             })()}
-          </>
+            {address ? <details className="dropdown dropdown-end leading-3">
+              <summary tabIndex={0} className="btn btn-secondary btn-sm pl-0 pr-2 shadow-md dropdown-toggle gap-0 !h-auto">
+                {/* <BlockieAvatar address={checkSumAddress} size={30} ensImage={ensAvatar} /> */}
+                <span className="ml-2 mr-1">
+                  {address?.slice(0, 6) + "..." + address?.slice(-4)}
+                </span>
+              </summary>
+
+            </details> : <button className="btn btn-primary btn-sm" onClick={async () => {
+              await setUpAddressAsync()
+            }} >Get Bracelet Addr</button>}
+          </div>
         );
       }}
     </ConnectButton.Custom>
