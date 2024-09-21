@@ -11,6 +11,7 @@ import { useAuthContext } from "~~/contexts/AuthContext";
 import { useAutoConnect, useNetworkColor } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
+import { BlockieAvatar } from "../BlockieAvatar";
 
 /**
  * Custom Wagmi Connect Button (watch balance + custom design)
@@ -20,6 +21,7 @@ export const RainbowKitCustomConnectButton = () => {
   const networkColor = useNetworkColor();
   const { targetNetwork } = useTargetNetwork();
   const { address, setUpAddressAsync } = useAuthContext();
+  // let address = "0x1234567890"
 
   return (
     <ConnectButton.Custom>
@@ -62,9 +64,15 @@ export const RainbowKitCustomConnectButton = () => {
                 </>
               );
             })()}
-            {address ? <div className="border text-sm">
-              {address.slice(0, 4)}...{address.slice(-4)}
-            </div> : <button className="btn btn-primary btn-sm" onClick={async () => {
+            {address ? <details className="dropdown dropdown-end leading-3">
+              <summary tabIndex={0} className="btn btn-secondary btn-sm pl-0 pr-2 shadow-md dropdown-toggle gap-0 !h-auto">
+                <BlockieAvatar address={address} size={30} ensImage={""} />
+                <span className="ml-2 mr-1">
+                  {address?.slice(0, 6) + "..." + address?.slice(-4)}
+                </span>
+              </summary>
+
+            </details> : <button className="btn btn-primary btn-sm" onClick={async () => {
               await setUpAddressAsync()
             }} >Get Bracelet Addr</button>}
           </div>

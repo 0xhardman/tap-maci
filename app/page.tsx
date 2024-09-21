@@ -18,20 +18,23 @@ const Home: NextPage = () => {
     <>
       <div className="flex items-center flex-col flex-grow pt-10">
         <div className="px-5">
-          <h1 className="text-4xl font-bold text-center">Private Voting Starter Kit with MACI</h1>
+          <h1 className="text-5xl font-bold text-center">MAC
+            <span className="text-red-500 animate-pulse">P</span>
+            I</h1>
 
-          <div className="flex flex-col-reverse md:flex-row justify-center items-center mt-10 sm:w-2/3 mx-auto gap-x-10 gap-y-5 mb-10">
+          <div className="flex flex-col-reverse md:flex-row justify-center items-center mt-10 w-3/4 text-center mx-auto gap-x-10 gap-y-5 mb-10">
             <div className="flex-1">
-              <p className="text-lg mt-5 text-justify">
-                This starter kit is designed to help you get started with private voting using the Minimal
-                Anti-Collusion Infrastructure (MACI).
+              <p className="text-3xl mt-5 text-center text-nowrap whitespace-nowrap">
+                A reliable DAO voting infrastructure
+                <br />
+                for next billion users ⌐◨-◨
               </p>
-              <div className="text-center">
+              <div className="text-center w-full">
                 <RegisterButton />
               </div>
             </div>
-            <div className="flex-1">
-              <img src={`https://noun-api.com/beta/pfp?name=${final}`} alt="MACI" className="w-full" />
+            <div className="flex-none">
+              <img src={`https://noun-api.com/beta/pfp?name=${final}`} alt="MACI" className="w-[300px]" />
             </div>
           </div>
         </div>
