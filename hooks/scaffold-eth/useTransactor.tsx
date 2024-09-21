@@ -56,17 +56,23 @@ export const useTransactor = (_walletClient?: WalletClient): TransactionFunc => 
       notificationId = notification.loading(<TxnNotification message="Awaiting for user confirmation" />);
       if (typeof tx === "function") {
         // Tx is already prepared by the caller
+        console.log("Running transaction");
         const result = await tx();
         if (typeof result === "string") {
+          console.log("Transaction hash received");
           transactionHash = result;
         } else {
+          console.log("Transaction result received");
           transactionHash = result.hash;
         }
       } else if (tx != null) {
+        console.log("Sending transaction");
         transactionHash = await walletClient.sendTransaction(tx);
       } else {
+        console.error("Incorrect transaction passed to transactor");
         throw new Error("Incorrect transaction passed to transactor");
       }
+      console.log("Transaction hash", transactionHash);
       notification.remove(notificationId);
 
       const blockExplorerTxURL = network ? getBlockExplorerTxLink(network, transactionHash) : "";

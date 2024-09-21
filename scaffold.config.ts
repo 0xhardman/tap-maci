@@ -1,3 +1,4 @@
+import { defineChain } from "viem";
 import * as chains from "viem/chains";
 
 export type ScaffoldConfig = {
@@ -9,9 +10,31 @@ export type ScaffoldConfig = {
   walletAutoConnect: boolean;
 };
 
+export const holesky = defineChain({
+  id: 17000,
+  network: 'holesky',
+  name: 'Holesky',
+  nativeCurrency: { name: 'Holesky Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: ['https://holesky.infura.io/v3/6959166847ff4ba499178f3d110c920f'],
+    },
+    public: {
+      http: ['https://holesky.infura.io/v3/6959166847ff4ba499178f3d110c920f'],
+    },
+  },
+  contracts: {
+    multicall3: {
+      address: '0xca11bde05977b3631167028862be2a173976ca11',
+      blockCreated: 77,
+    },
+  },
+  testnet: true,
+})
+
 const scaffoldConfig = {
   // The networks on which your DApp is live
-  targetNetworks: [chains.holesky],
+  targetNetworks: [holesky],
 
   // The interval at which your front-end polls the RPC servers for new data
   // it has no effect if you only target the local network (default is 4000)

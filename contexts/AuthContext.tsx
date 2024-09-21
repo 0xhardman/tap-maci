@@ -100,15 +100,20 @@ export default function AuthContextProvider({ children }: { children: React.Reac
 
   useEffect(() => {
     if (!keypair || !SignUpEvents || !SignUpEvents.length) {
+      console.log("No keypair or events");
+      console.log({ keypair, SignUpEvents });
       setStateIndex(null);
       return;
     }
-
+    console.log({ SignUpEvents })
+    console.log("keypair.pubKey.asContractParam().x", keypair.pubKey.asContractParam().x);
+    console.log("keypair.pubKey.asContractParam().y", keypair.pubKey.asContractParam().y);
     const event = SignUpEvents.filter(
       log =>
         log.args._userPubKeyX?.toString() === keypair.pubKey.asContractParam().x &&
         log.args._userPubKeyY?.toString() === keypair.pubKey.asContractParam().y,
     )[0];
+    console.log("!!!!!", { event })
     setStateIndex(event?.args?._stateIndex || null);
   }, [keypair, SignUpEvents]);
 

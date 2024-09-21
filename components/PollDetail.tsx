@@ -107,6 +107,8 @@ export default function PollDetail({ id }: { id: bigint }) {
   }, [coordinatorPubKeyResult]);
 
   const castVote = async () => {
+    console.log("cast vote");
+    console.log({ poll, stateIndex, coordinatorPubKey, keypair });
     if (!poll || stateIndex == null || !coordinatorPubKey || !keypair) {
       notification.error("Error casting vote. Please refresh the page and try again.");
       return;
