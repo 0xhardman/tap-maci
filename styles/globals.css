@@ -30,3 +30,9 @@ p {
 .btn.btn-ghost {
   @apply shadow-none;
 }
+
+.vt323-regular {
+  font-family: "VT323", monospace;
+  font-weight: 400;
+  font-style: normal;
+}

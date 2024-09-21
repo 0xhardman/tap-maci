@@ -5,10 +5,15 @@ import RegisterButton from "./_components/RegisterButton";
 import type { NextPage } from "next";
 import HeroImage from "~~/assets/private_voting.png";
 import { useAuthUserOnly } from "~~/hooks/useAuthUserOnly";
+import { useAccount } from "wagmi";
+import { useAuthContext } from "~~/contexts/AuthContext";
 
 const Home: NextPage = () => {
   useAuthUserOnly({ inverted: true });
-
+  const { address: bandAddress } = useAuthContext();
+  const { address } = useAccount();
+  const final = bandAddress || address || "MACPI"
+  console.log({ final })
   return (
     <>
       <div className="flex items-center flex-col flex-grow pt-10">
@@ -26,7 +31,7 @@ const Home: NextPage = () => {
               </div>
             </div>
             <div className="flex-1">
-              <Image src={HeroImage} alt="MACI" className="w-full" />
+              <img src={`https://noun-api.com/beta/pfp?name=${final}`} alt="MACI" className="w-full" />
             </div>
           </div>
         </div>
