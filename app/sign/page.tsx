@@ -2,7 +2,7 @@
 import { execHaloCmdWeb } from '@arx-research/libhalo/api/web.js';
 import { useState } from 'react';
 import { useNFCAuthContext } from '~~/contexts/AuthNFCContext';
-import { useAccount } from '~~/hooks/nft/useAccount';
+import { useAccount } from '~~/hooks/nfc/useAccount';
 import { hexEncodedString } from '~~/utils/nfc';
 
 export default function SignPage() {

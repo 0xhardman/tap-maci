@@ -2,8 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { Keypair, PrivKey } from "maci-domainobjs";
-import { useSignMessage } from "~~/hooks/nft/useSignMessage";
-import { useAccount } from "~~/hooks/nft/useAccount";
+import { useSignMessage } from "~~/hooks/nfc/useSignMessage";
 import deployedContracts from "~~/contracts/deployedContracts";
 import { useScaffoldContractRead, useScaffoldEventHistory, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
 import scaffoldConfig from "~~/scaffold.config";
