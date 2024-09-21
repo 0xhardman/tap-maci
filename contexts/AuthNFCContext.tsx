@@ -6,7 +6,7 @@ import { useSignMessage } from "~~/hooks/nfc/useSignMessage";
 import deployedContracts from "~~/contracts/deployedContracts";
 import { useScaffoldContractRead, useScaffoldEventHistory, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
 import scaffoldConfig from "~~/scaffold.config";
-import { execHaloCmdWeb } from "@arx-research/libhalo/api/web.js";
+import { execHaloCmdWeb } from "~~/lib/libhalo/api/web.js";
 import { hexEncodedString } from "~~/utils/nfc";
 
 interface INFCAuthContext {

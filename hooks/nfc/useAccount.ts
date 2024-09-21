@@ -1,4 +1,4 @@
-import { execHaloCmdWeb } from '@arx-research/libhalo/api/web.js';
+import { execHaloCmdWeb } from '~~/lib/libhalo/api/web.js';
 import { useEffect, useState } from 'react';
 import { hexEncodedString } from '~~/utils/nfc';
 export function useAccount() {
