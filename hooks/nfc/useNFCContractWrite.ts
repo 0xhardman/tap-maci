@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTargetNetwork } from "../scaffold-eth/useTargetNetwork";
 import { Abi, ExtractAbiFunctionNames } from "abitype";
-import { useContractWrite, useNetwork } from "wagmi";
+import { sepolia, useContractWrite, useNetwork } from "wagmi";
 import { useDeployedContractInfo, useTransactor } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
 import { ContractAbi, ContractName, UseScaffoldWriteConfig } from "~~/utils/scaffold-eth/contract";
@@ -9,6 +9,8 @@ import { execHaloCmdWeb } from "~~/lib/libhalo/api/web.js";
 import { createWalletClient, custom, encodeFunctionData, Hash, keccak256 } from "viem";
 import { hexEncodedString } from "~~/utils/nfc";
 import rlp from 'rlp';
+import { useAuthContext } from "~~/contexts/AuthContext";
+import { useNFCAuthContext } from "~~/contexts/AuthNFCContext";
 
 type UpdatedArgs = Parameters<ReturnType<typeof useContractWrite < Abi, string, undefined >>["writeAsync"]>[0];
 
@@ -36,10 +38,9 @@ export const useNFCContractWrite = <
   ...writeConfig
 }: UseScaffoldWriteConfig<TContractName, TFunctionName>) => {
   const { data: deployedContractData } = useDeployedContractInfo(contractName);
-  const { chain } = useNetwork();
+  const { address } = useNFCAuthContext()
   const writeTx = useTransactor();
   const [isMining, setIsMining] = useState(false);
-  const { targetNetwork } = useTargetNetwork();
 
   const sendContractWriteTx = async ({
     args: newArgs,
@@ -53,19 +54,9 @@ export const useNFCContractWrite = <
       notification.error("Target Contract is not deployed, did you forget to run `yarn deploy`?");
       return;
     }
-    if (!chain?.id) {
-      notification.error("Please connect your wallet");
-      return;
-    }
-    if (chain?.id !== targetNetwork.id) {
-      notification.error("You are on the wrong network");
-      return;
-    }
-
-    console.log(chain)
     const client = createWalletClient({
-      account: '0x...',
-      chain: chain,
+      account: address,
+      chain: sepolia,
       transport: custom(window.ethereum!)
     })
     const data = encodeFunctionData({
@@ -89,12 +80,19 @@ export const useNFCContractWrite = <
       keyNo: 1,
       message: msgHash,
       format: "hex"
+    }, {
+      sign: "eth_sign"
     })
+    console.log({ res })
     const { v, r, s } = res.signature.raw
     const transaction = { nonce: request.nonce, gasPrice: request.gasPrice, gasLimit: request.gas, to: request.to, value: request.value, data: request.data, v, r, s }
+    console.log({ transaction })
     const signedRawTransaction = rlp.encode([transaction.nonce, transaction.gasPrice, transaction.gasLimit, transaction.to, transaction.value, transaction.data, transaction.v, transaction.r, transaction.s])
+    console.log({ signedRawTransaction })
     const serializedTransaction = `0x${Buffer.from(signedRawTransaction).toString('hex')}` as `0x${string}`
+    console.log({ serializedTransaction })
     const hash = await client.sendRawTransaction({ serializedTransaction })
+    console.log({ hash })
     try {
       setIsMining(true);
 

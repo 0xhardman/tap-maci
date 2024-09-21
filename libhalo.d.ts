@@ -4,6 +4,8 @@ declare module '~~/lib/libhalo/api/web.js' {
         keyNo: number;
         message: string;
         format?: string;
+    }, options?: {
+        sign?: string
     }): Promise<{
         etherAddress: string;
         input: {
