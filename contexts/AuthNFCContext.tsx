@@ -6,7 +6,7 @@ import { useSignMessage } from "~~/hooks/nfc/useSignMessage";
 import deployedContracts from "~~/contracts/deployedContracts";
 import { useScaffoldContractRead, useScaffoldEventHistory, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
 import scaffoldConfig from "~~/scaffold.config";
-import { execHaloCmdWeb } from "~~/lib/libhalo/api/web.js";
+import { execHaloCmdWeb } from "@arx-research/libhalo/api/web.js";
 import { hexEncodedString } from "~~/utils/nfc";
 
 interface INFCAuthContext {
@@ -68,15 +68,12 @@ export default function AuthNFCContextProvider({ children }: { children: React.R
   // }, [address, signMessageAsync]);
 
   const generateKeypair = async () => {
-    console.log('generate keypair')
-    console.log({ address })
     if (!address) return;
 
     try {
       const signature = await signMessageAsync() as `0x${string}`;
       const userKeyPair = new Keypair(new PrivKey(signature));
       setKeyPair(userKeyPair);
-      console.log("Generated Keypair", userKeyPair);
     } catch (err) {
       console.error(err);
     }

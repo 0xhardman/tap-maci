@@ -2,52 +2,79 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { Keypair, PrivKey } from "maci-domainobjs";
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount } from "wagmi";
+import { useSignMessage } from "~~/hooks/nfc/useSignMessage";
 import deployedContracts from "~~/contracts/deployedContracts";
 import { useScaffoldContractRead, useScaffoldEventHistory, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
 import scaffoldConfig from "~~/scaffold.config";
+import { execHaloCmdWeb } from "@arx-research/libhalo/api/web.js";
+import { hexEncodedString } from "~~/utils/nfc";
 
 interface IAuthContext {
+  address: string;
   isRegistered: boolean;
   keypair: Keypair | null;
   stateIndex: bigint | null;
   generateKeypair: () => void;
+  setUpAddressAsync: () => Promise<void>;
 }
 
 export const AuthContext = createContext<IAuthContext>({} as IAuthContext);
 
 export default function AuthContextProvider({ children }: { children: React.ReactNode }) {
   const { address } = useAccount();
+  const [bandAddress, setBandAddress] = useState<string>("");
   const [keypair, setKeyPair] = useState<Keypair | null>(null);
   const [stateIndex, setStateIndex] = useState<bigint | null>(null);
   const [signatureMessage, setSignatureMessage] = useState<string>("");
 
-  const { signMessageAsync } = useSignMessage({ message: signatureMessage });
 
   useEffect(() => {
     setSignatureMessage(`Login to ${window.location.origin}`);
   }, []);
 
-  const generateKeypair = useCallback(() => {
-    if (!address) return;
-
-    (async () => {
-      try {
-        const signature = await signMessageAsync();
-        const userKeyPair = new Keypair(new PrivKey(signature));
-        setKeyPair(userKeyPair);
-        console.log("Generated Keypair", userKeyPair);
-      } catch (err) {
-        console.error(err);
+  const generateKeypair = async () => {
+    try {
+      console.log({ signatureMessage, bandAddress, address })
+      if (!signatureMessage || !bandAddress || !address) {
+        alert("Please set up your address first");
+        return
       }
-    })();
-  }, [address, signMessageAsync]);
+      console.log({ signatureMessage })
+      const res = await execHaloCmdWeb(
+        {
+          name: "sign",
+          keyNo: 1,
+          message: hexEncodedString(signatureMessage)
+        })
+      console.log({ res })
+      const signature = res.signature.ether;
+      console.log({ signature })
+      const userKeyPair = new Keypair(new PrivKey(signature));
+      setKeyPair(userKeyPair);
+      console.log("Generated Keypair", userKeyPair);
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
-  useEffect(() => {
-    setKeyPair(null);
-
-    generateKeypair();
-  }, [generateKeypair]);
+  const setUpAddressAsync = async () => {
+    console.log('handle click in useCallback')
+    try {
+      const res = await execHaloCmdWeb(
+        {
+          name: "sign",
+          keyNo: 1,
+          message: hexEncodedString("get address")
+        })
+      console.log({ res })
+      setBandAddress(res.etherAddress);
+      localStorage.setItem('address', res.etherAddress);
+      // alert(res)
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const { data: isRegistered, refetch: refetchIsRegistered } = useScaffoldContractRead({
     contractName: "MACIWrapper",
@@ -104,7 +131,7 @@ export default function AuthContextProvider({ children }: { children: React.Reac
   });
 
   return (
-    <AuthContext.Provider value={{ isRegistered: Boolean(isRegistered), keypair, stateIndex, generateKeypair }}>
+    <AuthContext.Provider value={{ address: bandAddress, isRegistered: Boolean(isRegistered), keypair, stateIndex, generateKeypair, setUpAddressAsync }}>
       {children}
     </AuthContext.Provider>
   );

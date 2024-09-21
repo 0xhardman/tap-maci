@@ -1,5 +1,5 @@
 'use client';
-import { execHaloCmdWeb } from '~~/lib/libhalo/api/web.js';
+import { execHaloCmdWeb } from '@arx-research/libhalo/api/web.js';
 import { useState } from 'react';
 import { useNFCAuthContext } from '~~/contexts/AuthNFCContext';
 import { useAccount } from '~~/hooks/nfc/useAccount';

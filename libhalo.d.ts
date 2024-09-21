@@ -1,4 +1,4 @@
-declare module '~~/lib/libhalo/api/web.js' {
+declare module '@arx-research/libhalo/api/web.js' {
     export function execHaloCmdWeb(params: {
         name: string;
         keyNo: number;

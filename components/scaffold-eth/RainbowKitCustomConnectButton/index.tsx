@@ -7,7 +7,7 @@ import { AddressQRCodeModal } from "./AddressQRCodeModal";
 import { WrongNetworkDropdown } from "./WrongNetworkDropdown";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Address } from "viem";
-import { useNFCAuthContext } from "~~/contexts/AuthNFCContext";
+import { useAuthContext } from "~~/contexts/AuthContext";
 import { useAutoConnect, useNetworkColor } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
@@ -19,7 +19,7 @@ export const RainbowKitCustomConnectButton = () => {
   // useAutoConnect();
   const networkColor = useNetworkColor();
   const { targetNetwork } = useTargetNetwork();
-  const { address, setUpAddressAsync } = useNFCAuthContext();
+  const { address, setUpAddressAsync } = useAuthContext();
 
   return (
     <ConnectButton.Custom>

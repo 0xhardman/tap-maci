@@ -1,4 +1,4 @@
-import { execHaloCmdWeb } from '~~/lib/libhalo/api/web.js';
+import { execHaloCmdWeb } from '@arx-research/libhalo/api/web.js';
 import { useCallback } from 'react';
 import { hexEncodedString } from '~~/utils/nfc';
 export function useSignMessage({ message }: { message: string }) {
@@ -11,8 +11,6 @@ export function useSignMessage({ message }: { message: string }) {
                     keyNo: 1,
                     message: hexEncodedString(message)
                 })
-            console.log(`${message}${hexEncodedString(message)}`)
-            console.log({ res })
             return res.signature.ether;
             // alert(res)
         } catch (error) {

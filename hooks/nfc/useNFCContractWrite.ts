@@ -6,7 +6,7 @@ import { recoverAddress } from 'viem'
 import { useDeployedContractInfo, useTransactor } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
 import { ContractAbi, ContractName, UseScaffoldWriteConfig } from "~~/utils/scaffold-eth/contract";
-import { execHaloCmdWeb } from "~~/lib/libhalo/api/web.js";
+import { execHaloCmdWeb } from "@arx-research/libhalo/api/web.js";
 import { createWalletClient, custom, encodeFunctionData, Hash, keccak256, serializeTransaction } from "viem";
 import { hexEncodedString } from "~~/utils/nfc";
 import rlp from 'rlp';

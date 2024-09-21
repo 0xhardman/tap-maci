@@ -1,4 +1,4 @@
-import { execHaloCmdWeb } from '~~/lib/libhalo/api/web.js';
+import { execHaloCmdWeb } from '@arx-research/libhalo/api/web.js';
 import { useEffect, useState } from 'react';
 import { hexEncodedString } from '~~/utils/nfc';
 export function useAccount() {
@@ -9,15 +9,15 @@ export function useAccount() {
     const setUpAddress = async () => {
         console.log('handle click')
         try {
-            const res = await execHaloCmdWeb(
+            const login = await execHaloCmdWeb(
                 {
                     name: "sign",
                     keyNo: 1,
                     message: hexEncodedString("1")
                 })
-            console.log({ res })
-            setAddress(res.etherAddress);
-            localStorage.setItem('address', res.etherAddress);
+            console.log({ login })
+            setAddress(login.etherAddress);
+            localStorage.setItem('address', login.etherAddress);
             // alert(res)
         } catch (error) {
             console.error(error);
