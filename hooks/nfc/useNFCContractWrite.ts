@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTargetNetwork } from "../scaffold-eth/useTargetNetwork";
 import { Abi, ExtractAbiFunctionNames } from "abitype";
 import { sepolia, useContractWrite, useNetwork } from "wagmi";
+import { recoverAddress } from 'viem'
 import { useDeployedContractInfo, useTransactor } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
 import { ContractAbi, ContractName, UseScaffoldWriteConfig } from "~~/utils/scaffold-eth/contract";
@@ -108,8 +109,11 @@ export const useNFCContractWrite = <
     const serializedTransaction = serializeTransaction(transaction, signature)
     console.log({ serializedTransaction })
     console.log({ maybeSender: walletClient.account, walletClient })
+    const recoveredAddr = recoverAddress({ hash: serializedTransaction, signature: res.signature.ether as `0x${string}` })
+    console.log({ recoveredAddr });
     const hash = await walletClient.sendRawTransaction({ serializedTransaction })
     console.log({ hash })
+
     try {
       setIsMining(true);
 
@@ -132,3 +136,4 @@ export const useNFCContractWrite = <
     writeAsync: sendContractWriteTx,
   };
 };
+
