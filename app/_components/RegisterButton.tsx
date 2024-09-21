@@ -1,10 +1,11 @@
 import { useNFCAuthContext } from "~~/contexts/AuthNFCContext";
+import { useNFCContractWrite } from "~~/hooks/nfc/useNFCContractWrite";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 export default function RegisterButton() {
   const { keypair, isRegistered, generateKeypair } = useNFCAuthContext();
 
-  const { writeAsync } = useScaffoldContractWrite({
+  const { writeAsync } = useNFCContractWrite({
     contractName: "MACIWrapper",
     functionName: "signUp",
     args: [keypair?.pubKey.asContractParam() as { x: bigint; y: bigint }, "0x", "0x"],
