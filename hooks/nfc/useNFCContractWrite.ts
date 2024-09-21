@@ -11,6 +11,8 @@ import { hexEncodedString } from "~~/utils/nfc";
 import rlp from 'rlp';
 import { useAuthContext } from "~~/contexts/AuthContext";
 import { useNFCAuthContext } from "~~/contexts/AuthNFCContext";
+import { useAccount } from "./useAccount";
+import { useAccount as useWagmiAccount } from "wagmi";
 
 type UpdatedArgs = Parameters<ReturnType<typeof useContractWrite < Abi, string, undefined >>["writeAsync"]>[0];
 
@@ -39,6 +41,7 @@ export const useNFCContractWrite = <
 }: UseScaffoldWriteConfig<TContractName, TFunctionName>) => {
   const { data: deployedContractData } = useDeployedContractInfo(contractName);
   const { address } = useNFCAuthContext()
+  // const { address } = useWagmiAccount()
   const writeTx = useTransactor();
   const [isMining, setIsMining] = useState(false);
 
@@ -67,7 +70,8 @@ export const useNFCContractWrite = <
     const request = await client.prepareTransactionRequest({
       to: deployedContractData?.address,
       value: newValue ?? value,
-      data: data
+      data: data,
+      account: address as string
     })
     console.log({ request })
     let rawTransaction = rlp.encode([request.nonce, request.gasPrice, request.gas, request.to, request.value, request.data])
