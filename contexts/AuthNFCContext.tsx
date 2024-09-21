@@ -2,25 +2,48 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { Keypair, PrivKey } from "maci-domainobjs";
-import { useAccount, useSignMessage } from "wagmi";
+import { useSignMessage } from "~~/hooks/nft/useSignMessage";
+import { useAccount } from "~~/hooks/nft/useAccount";
 import deployedContracts from "~~/contracts/deployedContracts";
 import { useScaffoldContractRead, useScaffoldEventHistory, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
 import scaffoldConfig from "~~/scaffold.config";
+import { execHaloCmdWeb } from "@arx-research/libhalo/api/web.js";
+import { hexEncodedString } from "~~/utils/nfc";
 
-interface IAuthContext {
+interface INFCAuthContext {
+  address: string;
   isRegistered: boolean;
   keypair: Keypair | null;
   stateIndex: bigint | null;
-  generateKeypair: () => void;
+  generateKeypair: () => Promise<void>;
+  setUpAddressAsync: () => Promise<void>;
 }
 
-export const AuthContext = createContext<IAuthContext>({} as IAuthContext);
+export const NFCAuthContext = createContext<INFCAuthContext>({} as INFCAuthContext);
 
-export default function AuthContextProvider({ children }: { children: React.ReactNode }) {
-  const { address } = useAccount();
+export default function AuthNFCContextProvider({ children }: { children: React.ReactNode }) {
+  const [address, setAddress] = useState<string>("");
   const [keypair, setKeyPair] = useState<Keypair | null>(null);
   const [stateIndex, setStateIndex] = useState<bigint | null>(null);
   const [signatureMessage, setSignatureMessage] = useState<string>("");
+
+  const setUpAddressAsync = async () => {
+    console.log('handle click in useCallback')
+    try {
+      const res = await execHaloCmdWeb(
+        {
+          name: "sign",
+          keyNo: 1,
+          message: hexEncodedString("1")
+        })
+      console.log({ res })
+      setAddress(res.etherAddress);
+      localStorage.setItem('address', res.etherAddress);
+      // alert(res)
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const { signMessageAsync } = useSignMessage({ message: signatureMessage });
 
@@ -28,26 +51,43 @@ export default function AuthContextProvider({ children }: { children: React.Reac
     setSignatureMessage(`Login to ${window.location.origin}`);
   }, []);
 
-  const generateKeypair = useCallback(() => {
+  // const generateKeypair = useCallback(() => {
+  //   console.log('generate keypair')
+  //   console.log(generateKeypair, { address })
+  //   if (!address) return;
+
+  //   (async () => {
+  //     try {
+  //       const signature = await signMessageAsync() as `0x${string}`;
+  //       const userKeyPair = new Keypair(new PrivKey(signature));
+  //       setKeyPair(userKeyPair);
+  //       console.log("Generated Keypair", userKeyPair);
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   })();
+  // }, [address, signMessageAsync]);
+
+  const generateKeypair = async () => {
+    console.log('generate keypair')
+    console.log(generateKeypair, { address })
     if (!address) return;
 
-    (async () => {
-      try {
-        const signature = await signMessageAsync();
-        const userKeyPair = new Keypair(new PrivKey(signature));
-        setKeyPair(userKeyPair);
-        console.log("Generated Keypair", userKeyPair);
-      } catch (err) {
-        console.error(err);
-      }
-    })();
-  }, [address, signMessageAsync]);
+    try {
+      const signature = await signMessageAsync() as `0x${string}`;
+      const userKeyPair = new Keypair(new PrivKey(signature));
+      setKeyPair(userKeyPair);
+      console.log("Generated Keypair", userKeyPair);
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
-  useEffect(() => {
-    setKeyPair(null);
+  // useEffect(() => {
+  //   setKeyPair(null);
 
-    generateKeypair();
-  }, [generateKeypair]);
+  //   generateKeypair();
+  // }, [generateKeypair]);
 
   const { data: isRegistered, refetch: refetchIsRegistered } = useScaffoldContractRead({
     contractName: "MACIWrapper",
@@ -104,10 +144,10 @@ export default function AuthContextProvider({ children }: { children: React.Reac
   });
 
   return (
-    <AuthContext.Provider value={{ isRegistered: Boolean(isRegistered), keypair, stateIndex, generateKeypair }}>
+    <NFCAuthContext.Provider value={{ address, isRegistered: Boolean(isRegistered), keypair, stateIndex, generateKeypair, setUpAddressAsync }}>
       {children}
-    </AuthContext.Provider>
+    </NFCAuthContext.Provider>
   );
 }
 
-export const useAuthContext = () => useContext(AuthContext);
+export const useNFCAuthContext = () => useContext(NFCAuthContext);

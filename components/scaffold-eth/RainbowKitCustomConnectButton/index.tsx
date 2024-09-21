@@ -7,7 +7,7 @@ import { AddressQRCodeModal } from "./AddressQRCodeModal";
 import { WrongNetworkDropdown } from "./WrongNetworkDropdown";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Address } from "viem";
-import useAccount from "~~/hooks/nft/useAccount";
+import { useNFCAuthContext } from "~~/contexts/AuthNFCContext";
 import { useAutoConnect, useNetworkColor } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
@@ -16,10 +16,10 @@ import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
  * Custom Wagmi Connect Button (watch balance + custom design)
  */
 export const RainbowKitCustomConnectButton = () => {
-  useAutoConnect();
+  // useAutoConnect();
   const networkColor = useNetworkColor();
   const { targetNetwork } = useTargetNetwork();
-  const { address, setUpAddress } = useAccount();
+  const { address, setUpAddressAsync } = useNFCAuthContext();
 
   return (
     <ConnectButton.Custom>
@@ -64,7 +64,9 @@ export const RainbowKitCustomConnectButton = () => {
             })()}
             {address ? <div className="border text-sm">
               {address.slice(0, 4)}...{address.slice(-4)}
-            </div> : <button className="btn btn-primary btn-sm" onClick={() => { setUpAddress() }} >Get Bracelet Addr</button>}
+            </div> : <button className="btn btn-primary btn-sm" onClick={async () => {
+              await setUpAddressAsync()
+            }} >Get Bracelet Addr</button>}
           </div>
         );
       }}

@@ -1,9 +1,10 @@
 import { execHaloCmdWeb } from '@arx-research/libhalo/api/web.js';
 import { useEffect, useState } from 'react';
 import { hexEncodedString } from '~~/utils/nfc';
-export default function useAccount() {
+export function useAccount() {
     //get data from local storage
     const [address, setAddress] = useState<string>();
+
     // const address = localStorage.getItem('address')
     const setUpAddress = async () => {
         console.log('handle click')
@@ -41,7 +42,7 @@ export default function useAccount() {
                     console.error(err);
                 })
         }
-    }, [execHaloCmdWeb])
+    }, [])
 
     return {
         address,

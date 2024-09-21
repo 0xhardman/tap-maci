@@ -10,10 +10,12 @@ import { Header } from "~~/components/Header";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { ProgressBar } from "~~/components/scaffold-eth/ProgressBar";
 import AuthContextProvider from "~~/contexts/AuthContext";
+import NFCAuthContextProvider from "~~/contexts/AuthNFCContext";
 import { useNativeCurrencyPrice } from "~~/hooks/scaffold-eth";
 import { useGlobalState } from "~~/services/store/store";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { appChains } from "~~/services/web3/wagmiConnectors";
+import { NFCAuthContext } from "~~/contexts/AuthNFCContext";
 
 const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
   const price = useNativeCurrencyPrice();
@@ -54,9 +56,11 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
         avatar={BlockieAvatar}
         theme={mounted ? (isDarkMode ? darkTheme() : lightTheme()) : lightTheme()}
       >
-        <AuthContextProvider>
-          <ScaffoldEthApp>{children}</ScaffoldEthApp>
-        </AuthContextProvider>
+        <NFCAuthContextProvider>
+          <AuthContextProvider>
+            <ScaffoldEthApp>{children}</ScaffoldEthApp>
+          </AuthContextProvider>
+        </NFCAuthContextProvider>
       </RainbowKitProvider>
     </WagmiConfig>
   );

@@ -1,8 +1,8 @@
-import { useAuthContext } from "~~/contexts/AuthContext";
+import { useNFCAuthContext } from "~~/contexts/AuthNFCContext";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 export default function RegisterButton() {
-  const { keypair, isRegistered, generateKeypair } = useAuthContext();
+  const { keypair, isRegistered, generateKeypair } = useNFCAuthContext();
 
   const { writeAsync } = useScaffoldContractWrite({
     contractName: "MACIWrapper",
