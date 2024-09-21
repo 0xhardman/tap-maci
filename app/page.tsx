@@ -24,7 +24,7 @@ const Home: NextPage = () => {
 
           <div className="flex flex-col-reverse md:flex-row justify-center items-center mt-10 w-3/4 text-center mx-auto gap-x-10 gap-y-5 mb-10">
             <div className="flex-1">
-              <p className="text-3xl mt-5 text-center text-nowrap whitespace-nowrap">
+              <p className="text-3xl mt-5 text-center">
                 A reliable DAO voting infrastructure
                 <br />
                 for next billion users ⌐◨-◨

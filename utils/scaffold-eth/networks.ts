@@ -53,6 +53,9 @@ export const NETWORKS_EXTRA_DATA: Record<string, ChainAttributes> = {
   [chains.scrollSepolia.id]: {
     color: "#fbebd4",
   },
+  [chains.holesky.id]: {
+    color: "#faff",
+  },
 };
 
 /**

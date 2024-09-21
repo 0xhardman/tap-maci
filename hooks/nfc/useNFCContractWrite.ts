@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useTargetNetwork } from "../scaffold-eth/useTargetNetwork";
 import { Abi, ExtractAbiFunctionNames } from "abitype";
-import { sepolia, useContractWrite, useNetwork } from "wagmi";
+import { useContractWrite, useNetwork } from "wagmi";
+import { holesky } from "wagmi/chains";
 import { recoverAddress } from 'viem'
 import { useDeployedContractInfo, useTransactor } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
@@ -97,7 +98,7 @@ export const useNFCContractWrite = <
     console.log({ signature })
     const transaction = {
       from: address,
-      chainId: sepolia.id,
+      chainId: holesky.id,
       gas: request.gas,
       maxFeePerGas: request.maxFeePerGas,
       maxPriorityFeePerGas: request.maxPriorityFeePerGas,
