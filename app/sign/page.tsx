@@ -1,10 +1,14 @@
 'use client';
 import { execHaloCmdWeb } from '@arx-research/libhalo/api/web.js';
 import { useState } from 'react';
+import useAccount from '~~/hooks/nft/useAccount';
+import { hexEncodedString } from '~~/utils/nfc';
 
 export default function SignPage() {
     const [input, setInput] = useState('');
     const [statusText, setStatusText] = useState('Click on the button');
+    const { address, setUpAddress } = useAccount();
+
     const handleClick = async (format: string) => {
         console.log('handle click')
         try {
@@ -12,8 +16,9 @@ export default function SignPage() {
                 {
                     name: "sign",
                     keyNo: 1,
-                    message: hexEncodedString(input),
+                    message: hexEncodedString(input)
                 })
+            console.log(input, hexEncodedString(input))
             console.log({ res })
             // alert(res)
         } catch (error) {
@@ -33,13 +38,10 @@ export default function SignPage() {
                 console.log('click hex')
                 handleClick('hex')
             }} >Hex sign</button>
-
+            {address ? address : <button className='border' onClick={() => { setUpAddress() }} >Get Address</button>}
         </div>
 
     </div>;
 }
 
 
-function hexEncodedString(input: string) {
-    return Buffer.from(input).toString('hex')
-}
