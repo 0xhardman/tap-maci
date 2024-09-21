@@ -69,7 +69,7 @@ export default function AuthNFCContextProvider({ children }: { children: React.R
 
   const generateKeypair = async () => {
     console.log('generate keypair')
-    console.log(generateKeypair, { address })
+    console.log({ address })
     if (!address) return;
 
     try {

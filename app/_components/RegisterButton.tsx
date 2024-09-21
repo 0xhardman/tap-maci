@@ -14,9 +14,15 @@ export default function RegisterButton() {
   });
 
   async function register() {
-    if (!keypair) return;
+    console.log("registering");
+    if (!keypair) {
+      console.log("no keypair");
+      return;
+    }
+    console.log("keypair", keypair);
 
     try {
+      console.log("writing");
       await writeAsync({ args: [keypair.pubKey.asContractParam() as { x: bigint; y: bigint }, "0x", "0x"] });
     } catch (err) {
       console.log(err);

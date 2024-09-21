@@ -6,13 +6,14 @@ import { useDeployedContractInfo, useTransactor } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
 import { ContractAbi, ContractName, UseScaffoldWriteConfig } from "~~/utils/scaffold-eth/contract";
 import { execHaloCmdWeb } from "~~/lib/libhalo/api/web.js";
-import { createWalletClient, custom, encodeFunctionData, Hash, keccak256 } from "viem";
+import { createWalletClient, custom, encodeFunctionData, Hash, keccak256, serializeTransaction } from "viem";
 import { hexEncodedString } from "~~/utils/nfc";
 import rlp from 'rlp';
 import { useAuthContext } from "~~/contexts/AuthContext";
 import { useNFCAuthContext } from "~~/contexts/AuthNFCContext";
 import { useAccount } from "./useAccount";
 import { useAccount as useWagmiAccount } from "wagmi";
+import { publicClient, walletClient } from "~~/client";
 
 type UpdatedArgs = Parameters<ReturnType<typeof useContractWrite < Abi, string, undefined >>["writeAsync"]>[0];
 
@@ -41,7 +42,7 @@ export const useNFCContractWrite = <
 }: UseScaffoldWriteConfig<TContractName, TFunctionName>) => {
   const { data: deployedContractData } = useDeployedContractInfo(contractName);
   const { address } = useNFCAuthContext()
-  // const { address } = useWagmiAccount()
+  const { address: wagmiAddress } = useWagmiAccount()
   const writeTx = useTransactor();
   const [isMining, setIsMining] = useState(false);
 
@@ -53,28 +54,27 @@ export const useNFCContractWrite = <
     args?: UseScaffoldWriteConfig<TContractName, TFunctionName>["args"];
     value?: UseScaffoldWriteConfig<TContractName, TFunctionName>["value"];
   } & UpdatedArgs = {}) => {
+    console.log({ deployedContractData })
     if (!deployedContractData) {
       notification.error("Target Contract is not deployed, did you forget to run `yarn deploy`?");
       return;
     }
-    const client = createWalletClient({
-      account: address,
-      chain: sepolia,
-      transport: custom(window.ethereum!)
-    })
     const data = encodeFunctionData({
       abi: deployedContractData?.abi as Abi,
       functionName: functionName as any,
       args: newArgs ?? args as any,
     })
-    const request = await client.prepareTransactionRequest({
+    console.log({ data })
+    const gasPrice = await publicClient.getGasPrice()
+    console.log({ gasPrice })
+    const request = await walletClient.prepareTransactionRequest({
       to: deployedContractData?.address,
-      value: newValue ?? value,
+      value: newValue ?? value ?? 0n,
       data: data,
       account: address as string
     })
     console.log({ request })
-    let rawTransaction = rlp.encode([request.nonce, request.gasPrice, request.gas, request.to, request.value, request.data])
+    let rawTransaction = rlp.encode([request.nonce, gasPrice, request.gas, request.to, request.value, request.data])
     console.log({ rawTransaction })
     const msgHex = Buffer.from(rawTransaction).toString('hex')
     console.log({ msgHex })
@@ -88,14 +88,27 @@ export const useNFCContractWrite = <
       sign: "eth_sign"
     })
     console.log({ res })
-    const { v, r, s } = res.signature.raw
-    const transaction = { nonce: request.nonce, gasPrice: request.gasPrice, gasLimit: request.gas, to: request.to, value: request.value, data: request.data, v, r, s }
-    console.log({ transaction })
-    const signedRawTransaction = rlp.encode([transaction.nonce, transaction.gasPrice, transaction.gasLimit, transaction.to, transaction.value, transaction.data, transaction.v, transaction.r, transaction.s])
-    console.log({ signedRawTransaction })
-    const serializedTransaction = `0x${Buffer.from(signedRawTransaction).toString('hex')}` as `0x${string}`
+    const signature = {
+      r: res.signature.raw.r as `0x${string}`,
+      s: res.signature.raw.s as `0x${string}`,
+      v: BigInt(res.signature.raw.v)
+    }
+    console.log({ signature })
+    const transaction = {
+      from: address,
+      chainId: sepolia.id,
+      gas: request.gas,
+      maxFeePerGas: request.maxFeePerGas,
+      maxPriorityFeePerGas: request.maxPriorityFeePerGas,
+      nonce: request.nonce,
+      to: request.to,
+      value: request.value,
+    }
+    console.log({ transaction, signature })
+    const serializedTransaction = serializeTransaction(transaction, signature)
     console.log({ serializedTransaction })
-    const hash = await client.sendRawTransaction({ serializedTransaction })
+    console.log({ maybeSender: walletClient.account, walletClient })
+    const hash = await walletClient.sendRawTransaction({ serializedTransaction })
     console.log({ hash })
     try {
       setIsMining(true);

@@ -11,6 +11,7 @@ export function useSignMessage({ message }: { message: string }) {
                     keyNo: 1,
                     message: hexEncodedString(message)
                 })
+            console.log(`${message}${hexEncodedString(message)}`)
             console.log({ res })
             return res.signature.ether;
             // alert(res)
