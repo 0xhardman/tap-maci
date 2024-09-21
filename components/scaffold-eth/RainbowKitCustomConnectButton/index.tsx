@@ -7,6 +7,7 @@ import { AddressQRCodeModal } from "./AddressQRCodeModal";
 import { WrongNetworkDropdown } from "./WrongNetworkDropdown";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Address } from "viem";
+import useAccount from "~~/hooks/nft/useAccount";
 import { useAutoConnect, useNetworkColor } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
@@ -18,6 +19,7 @@ export const RainbowKitCustomConnectButton = () => {
   useAutoConnect();
   const networkColor = useNetworkColor();
   const { targetNetwork } = useTargetNetwork();
+  const { address, setUpAddress } = useAccount();
 
   return (
     <ConnectButton.Custom>
@@ -28,7 +30,7 @@ export const RainbowKitCustomConnectButton = () => {
           : undefined;
 
         return (
-          <>
+          <div className="flex flex-col gap-2">
             {(() => {
               if (!connected) {
                 return (
@@ -60,7 +62,10 @@ export const RainbowKitCustomConnectButton = () => {
                 </>
               );
             })()}
-          </>
+            {address ? <div className="border text-sm">
+              {address.slice(0, 4)}...{address.slice(-4)}
+            </div> : <button className="btn btn-primary btn-sm" onClick={() => { setUpAddress() }} >Get Bracelet Addr</button>}
+          </div>
         );
       }}
     </ConnectButton.Custom>
