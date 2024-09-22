@@ -1,4 +1,5 @@
-import { useAuthContext } from "~~/contexts/AuthContext";
+import { execHaloCmdWeb } from "@arx-research/libhalo/api/web.js";
+import { hexEncodedString, useAuthContext } from "~~/contexts/AuthContext";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 export default function RegisterButton() {

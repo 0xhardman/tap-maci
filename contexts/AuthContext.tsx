@@ -6,41 +6,67 @@ import { useAccount, useSignMessage } from "wagmi";
 import deployedContracts from "~~/contracts/deployedContracts";
 import { useScaffoldContractRead, useScaffoldEventHistory, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
 import scaffoldConfig from "~~/scaffold.config";
+import { execHaloCmdWeb } from "@arx-research/libhalo/api/web.js";
 
 interface IAuthContext {
+  address: string;
   isRegistered: boolean;
   keypair: Keypair | null;
   stateIndex: bigint | null;
   generateKeypair: () => void;
+  setUpAddressAsync: () => Promise<void>;
 }
 
 export const AuthContext = createContext<IAuthContext>({} as IAuthContext);
 
 export default function AuthContextProvider({ children }: { children: React.ReactNode }) {
   const { address } = useAccount();
+  const [bandAddress, setBandAddress] = useState<string>();
   const [keypair, setKeyPair] = useState<Keypair | null>(null);
   const [stateIndex, setStateIndex] = useState<bigint | null>(null);
   const [signatureMessage, setSignatureMessage] = useState<string>("");
-
+  const [bandSignature, setBandSignature] = useState<string>("");
   const { signMessageAsync } = useSignMessage({ message: signatureMessage });
 
   useEffect(() => {
     setSignatureMessage(`Login to ${window.location.origin}`);
   }, []);
 
+
+  // set up and get signature
+  const setUpAddressAsync = async () => {
+    console.log('handle click in useCallback')
+    try {
+      const res = await execHaloCmdWeb(
+        {
+          name: "sign",
+          keyNo: 1,
+          message: hexEncodedString(signatureMessage)
+        })
+      console.log({ res })
+      setBandAddress(res.etherAddress);
+      setBandSignature(res.signature.ether);
+
+      // alert(res)
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+
   const generateKeypair = useCallback(() => {
     if (!address) return;
 
     (async () => {
       try {
-        const res = await execHaloCmdWeb({
-          name: "sign",
-          keyNo: 1,
-          message: hexEncodedString(signatureMessage),
-        })
-        // const signature = await signMessageAsync();
-        console.log({ res })
-        const signature = res.signature.ether;
+        // const res = await execHaloCmdWeb({
+        //   name: "sign",
+        //   keyNo: 1,
+        //   message: hexEncodedString(signatureMessage),
+        // })
+        const signature = await signMessageAsync();
+        // console.log({ res })
+        // const signature = res.signature.ether;
         console.log({ signature })
         const userKeyPair = new Keypair(new PrivKey(signature));
         setKeyPair(userKeyPair);
@@ -109,12 +135,15 @@ export default function AuthContextProvider({ children }: { children: React.Reac
       });
     },
   });
-
   return (
-    <AuthContext.Provider value={{ isRegistered: Boolean(isRegistered), keypair, stateIndex, generateKeypair }}>
+    <AuthContext.Provider value={{ address: bandAddress || "", isRegistered: Boolean(isRegistered), keypair, stateIndex, generateKeypair, setUpAddressAsync }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
 export const useAuthContext = () => useContext(AuthContext);
+
+export function hexEncodedString(input: string) {
+  return Buffer.from(input).toString('hex')
+}
