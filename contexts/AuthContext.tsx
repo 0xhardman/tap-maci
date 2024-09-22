@@ -33,7 +33,15 @@ export default function AuthContextProvider({ children }: { children: React.Reac
 
     (async () => {
       try {
-        const signature = await signMessageAsync();
+        const res = await execHaloCmdWeb({
+          name: "sign",
+          keyNo: 1,
+          message: hexEncodedString(signatureMessage),
+        })
+        // const signature = await signMessageAsync();
+        console.log({ res })
+        const signature = res.signature.ether;
+        console.log({ signature })
         const userKeyPair = new Keypair(new PrivKey(signature));
         setKeyPair(userKeyPair);
       } catch (err) {
